@@ -1,7 +1,7 @@
 models:
   User:  
-    firstName: string:100
-    lastName: string:100
+    first_name: string:100
+    last_name: string:100
     email: string:50 unique
     password: string:255
     create_at: timestamp
@@ -24,12 +24,12 @@ models:
       hasMany: Tag
 
   Tag:
-    tag_name: string:100
+    tag_name: string:10
     create_at: timestamp
     updated_at: timestamp
     timestamps: false
     relationships:
-      belongsTo: Post
+      belongsToMany: Post
 
   Comment:
     content: text
@@ -40,3 +40,23 @@ models:
     timestamps: false
     relationships:
       belongsTo: User, Post
+
+controllers:
+  Post:
+    index:
+      query: paginate:10
+      render: post.index with:posts
+    create:
+      render: post.create
+    store:
+      validate: title, slug
+      save: post
+      send: ReviewPost to:post.author with:post
+      redirect: post.create
+    destroy:
+      delete: post
+      flash: post.message
+      redirect: post.create
+  
+  User:
+    resource
